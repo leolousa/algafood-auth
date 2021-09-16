@@ -40,8 +40,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			.and()
 				.withClient("app-mobile") //Nome do cliente
 				.secret(passwordEncoder.encode("mob123")) //Chave senha do cliente
-				.authorizedGrantTypes("password", "outrogranttype") //Usando o fluxo Password Credentials
-				.scopes("write", "read");
+				.authorizedGrantTypes("password", "outro-grant-type") //Usando o fluxo Password Credentials
+				.scopes("write", "read")
+			.and()
+				.withClient("api-check-token") //Nome da api que quer se autenticar no Authorization Server
+				.secret(passwordEncoder.encode("api123")); //Secret da api
 	}
 	
 	@Override
