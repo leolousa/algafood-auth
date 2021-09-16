@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 /**
  * Classe de configuração do AuthorizationServer
  * 
@@ -41,6 +42,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.secret(passwordEncoder.encode("mob123")) //Chave senha do cliente
 				.authorizedGrantTypes("password", "outrogranttype") //Usando o fluxo Password Credentials
 				.scopes("write", "read");
+	}
+	
+	@Override
+	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+		//Informa que para fazer a requisição de check_token é necessário estar autenticado
+		security.checkTokenAccess("isAuthenticated()");
+		//security.checkTokenAccess("permitAll()"); //Permite acesso sem estar autenticado 	
 	}
 	
 	@Override
