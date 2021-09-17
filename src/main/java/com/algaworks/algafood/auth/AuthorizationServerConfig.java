@@ -3,6 +3,7 @@ package com.algaworks.algafood.auth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -11,6 +12,9 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 /**
  * Classe de configuração do AuthorizationServer
+ * 
+ * access_token: tempo padrão de validade: 12h
+ * refresh_token: tempo padrão de validade: 30d
  * 
  * @author Leonardo
  *
@@ -25,6 +29,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Autowired
 	private AuthenticationManager authManager;
 	
+	@Autowired
+	private UserDetailsService userDetailService;
+	
 	
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -34,7 +41,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			.inMemory()
 				.withClient("algafood-web") //Nome do cliente
 				.secret(passwordEncoder.encode("web123")) //Chave senha do cliente
-				.authorizedGrantTypes("password") //Usando o fluxo Password Credentials
+				.authorizedGrantTypes("password","refresh_token") //Usando o fluxo Password Credentials
 				.scopes("write", "read")
 				.accessTokenValiditySeconds(60 * 60 * 6) // 6h. padrão é 12h
 			.and()
@@ -56,6 +63,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-		endpoints.authenticationManager(authManager);
+		endpoints
+			.authenticationManager(authManager)
+			.userDetailsService(userDetailService);
 	}
 }
