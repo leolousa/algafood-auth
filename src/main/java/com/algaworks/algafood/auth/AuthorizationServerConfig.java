@@ -43,7 +43,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.secret(passwordEncoder.encode("web123")) //Chave senha do cliente
 				.authorizedGrantTypes("password","refresh_token") //Usando o fluxo Password Credentials
 				.scopes("write", "read")
-				.accessTokenValiditySeconds(60 * 60 * 6) // 6h. padrão é 12h
+				.accessTokenValiditySeconds(6 * 60 * 60) // 6h padrão é 12h
+				.refreshTokenValiditySeconds(60 * 24 * 60 * 60) // 60d padrão é 30d
 			.and()
 				.withClient("app-mobile") //Nome do cliente
 				.secret(passwordEncoder.encode("mob123")) //Chave senha do cliente
@@ -65,6 +66,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 		endpoints
 			.authenticationManager(authManager)
-			.userDetailsService(userDetailService);
+			.userDetailsService(userDetailService)
+			.reuseRefreshTokens(false); //Reutilizar o refresh_token
 	}
 }
