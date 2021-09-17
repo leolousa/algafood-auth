@@ -45,16 +45,26 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.scopes("write", "read")
 				.accessTokenValiditySeconds(6 * 60 * 60) // 6h padrão é 12h
 				.refreshTokenValiditySeconds(60 * 24 * 60 * 60) // 60d padrão é 30d
+			
 			.and()
 				.withClient("app-mobile") //Nome do cliente
 				.secret(passwordEncoder.encode("mob123")) //Chave senha do cliente
 				.authorizedGrantTypes("password", "outro-grant-type") //Usando o fluxo Password Credentials
 				.scopes("write", "read")
+
 			.and()
 				.withClient("faturamento") //Nome do cliente ex.: API que gera notas fiscais (sem interação com o usuário)
 				.secret(passwordEncoder.encode("fat123")) //Chave senha do cliente
 				.authorizedGrantTypes("client_credentials") //Usando o fluxo Client Credentials
 				.scopes("read")
+			
+			.and()
+				.withClient("foodanalytics")
+				.secret(passwordEncoder.encode("food123"))
+				.authorizedGrantTypes("authorization_code") //Usando o fluxo Authorization Code Grant Type
+				.scopes("write","read")
+				.redirectUris("https://aplicacao-cliente")
+				
 			.and()
 				.withClient("api-check-token") //Nome da api(Resource Server) que quer se autenticar no Authorization Server
 				.secret(passwordEncoder.encode("api123")); //Secret da api
