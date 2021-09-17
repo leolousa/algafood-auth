@@ -51,7 +51,12 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.authorizedGrantTypes("password", "outro-grant-type") //Usando o fluxo Password Credentials
 				.scopes("write", "read")
 			.and()
-				.withClient("api-check-token") //Nome da api que quer se autenticar no Authorization Server
+				.withClient("faturamento") //Nome do cliente ex.: API que gera notas fiscais (sem interação com o usuário)
+				.secret(passwordEncoder.encode("fat123")) //Chave senha do cliente
+				.authorizedGrantTypes("client_credentials") //Usando o fluxo Client Credentials
+				.scopes("read")
+			.and()
+				.withClient("api-check-token") //Nome da api(Resource Server) que quer se autenticar no Authorization Server
 				.secret(passwordEncoder.encode("api123")); //Secret da api
 	}
 	
