@@ -1,0 +1,18 @@
+USO DO KEYTOOL
+
+- Gera a chave privada:
+
+keytool -genkeypair -alias algafood -keyalg RSA -keypass 123456 -keystore algafood.jks -storepass 123456 -validity 3650
+
+- Listando as propriedades da chave privada:
+
+keytool -list -keystore algafood.jks
+
+- Gerando o certificado:
+
+keytool -export -rfc -alias algafood -keystore algafood.jks -file algafood-cert.pem
+
+- Gerando a chave pública:
+
+openssl x509 -pubkey -noout -in algafood-cert.pem > algafood-pkey.pem
+
