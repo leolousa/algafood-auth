@@ -63,7 +63,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.secret(passwordEncoder.encode("food123"))
 				.authorizedGrantTypes("authorization_code") //Usando o fluxo Authorization Code Grant Type
 				.scopes("write","read")
-				.redirectUris("http://aplicacao-cliente") //URL de retorno do Authorization Server para a app cliente
+				.redirectUris("http://foodanalytics.local:8082") //URL de retorno do Authorization Server para a app cliente
 				
 			.and()
 				.withClient("api-check-token") //Nome da api(Resource Server) que quer se autenticar no Authorization Server
