@@ -50,7 +50,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.accessTokenValiditySeconds(6 * 60 * 60) // 6h padrão é 12h
 				.refreshTokenValiditySeconds(60 * 24 * 60 * 60) // 60d padrão é 30d
 			
-			.and() // URL para o Authorization Server: http://auth.algafood.local:8081/oauth/authorize?response_type=code&client_id=foodanalytics&state=abc&redirect_uri=http://aplicacao-cliente
+			.and()
+				// Endereço para gerar Code Verifier e Code Challenge: https://tonyxu-io.github.io/pkce-generator/
+				// URL para o Authorization Server: http://auth.algafood.local:8081/oauth/authorize?response_type=code&client_id=foodanalytics&state=abc&redirect_uri=http://aplicacao-cliente
+			    // URL para o Authorization Server com PCSE SHA256:
+			    // http://auth.algafood.local:8081/oauth/authorize?response_type=code&client_id=foodanalytics&redirect_uri=http://foodanalytics.local:8082$code_challenge&code_challenge_method=s256
 				.withClient("foodanalytics")
 				.secret(passwordEncoder.encode("food123"))
 				.authorizedGrantTypes("authorization_code") //Usando o fluxo Authorization Code Grant Type
