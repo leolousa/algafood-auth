@@ -1,5 +1,7 @@
 package com.algaworks.algafood.auth;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,8 +12,10 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.CompositeTokenGranter;
+import org.springframework.security.oauth2.provider.TokenGranter;
 /**
- * Classe de configuração do AuthorizationServer
+ * Classe de configuração do Authorization Server
  * 
  * access_token: tempo padrão de validade: 12h
  * refresh_token: tempo padrão de validade: 30d
@@ -46,18 +50,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.accessTokenValiditySeconds(6 * 60 * 60) // 6h padrão é 12h
 				.refreshTokenValiditySeconds(60 * 24 * 60 * 60) // 60d padrão é 30d
 			
-			.and()
-				.withClient("app-mobile") //Nome do cliente
-				.secret(passwordEncoder.encode("mob123")) //Chave senha do cliente
-				.authorizedGrantTypes("password", "outro-grant-type") //Usando o fluxo Password Credentials
-				.scopes("write", "read")
-
-			.and()
-				.withClient("faturamento") //Nome do cliente ex.: API que gera notas fiscais (sem interação com o usuário)
-				.secret(passwordEncoder.encode("fat123")) //Chave senha do cliente
-				.authorizedGrantTypes("client_credentials") //Usando o fluxo Client Credentials
-				.scopes("read")
-			
 			.and() // URL para o Authorization Server: http://auth.algafood.local:8081/oauth/authorize?response_type=code&client_id=foodanalytics&state=abc&redirect_uri=http://aplicacao-cliente
 				.withClient("foodanalytics")
 				.secret(passwordEncoder.encode("food123"))
@@ -82,6 +74,19 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		endpoints
 			.authenticationManager(authManager)
 			.userDetailsService(userDetailService)
-			.reuseRefreshTokens(false); //Reutilizar o refresh_token
+			.reuseRefreshTokens(false) //Reutilizar o refresh_token
+			.tokenGranter(tokenGranter(endpoints)); 
+	}
+	
+	// Método que instancia o Autorization Code com PKCE
+	private TokenGranter tokenGranter(AuthorizationServerEndpointsConfigurer endpoints) {
+		var pkceAuthorizationCodeTokenGranter = new PkceAuthorizationCodeTokenGranter(endpoints.getTokenServices(),
+				endpoints.getAuthorizationCodeServices(), endpoints.getClientDetailsService(),
+				endpoints.getOAuth2RequestFactory());
+		
+		var granters = Arrays.asList(
+				pkceAuthorizationCodeTokenGranter, endpoints.getTokenGranter());
+		
+		return new CompositeTokenGranter(granters);
 	}
 }
