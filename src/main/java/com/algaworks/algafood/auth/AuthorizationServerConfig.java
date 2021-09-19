@@ -40,6 +40,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Autowired
 	private UserDetailsService userDetailService;
 	
+	@Autowired
+	private JwtKeyStoreProperties jwtKeyStoreProperties;
+	
 	
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -89,21 +92,18 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Bean
 	public JwtAccessTokenConverter jwtAccessTokenConverter() {
-		var jwtAccessTokenConverter = new JwtAccessTokenConverter();
-		
-		// Assinatura simétrica
-		//jwtAccessTokenConverter.setSigningKey("jfoiuwf080d98fsadifjsad08f7as9d86f9sdyfsad8f7sadfhjlhsadf");
-		
-		var jksResource = new ClassPathResource("keystore/algafood.jks");
-		var keyStorePass = "123456";
-		var keyParAlias = "algafood";
-		
-		var keyStoreKeyFactory = new KeyStoreKeyFactory(jksResource, keyStorePass.toCharArray());
-		var keyPar = keyStoreKeyFactory.getKeyPair(keyParAlias);
-		
-		jwtAccessTokenConverter.setKeyPair(keyPar);
-		
-		return jwtAccessTokenConverter;
+	    var jwtAccessTokenConverter = new JwtAccessTokenConverter();
+	    
+	    var jksResource = new ClassPathResource(jwtKeyStoreProperties.getPath());
+	    var keyStorePass = jwtKeyStoreProperties.getPassword();
+	    var keyPairAlias = jwtKeyStoreProperties.getKeypairAlias();
+	    
+	    var keyStoreKeyFactory = new KeyStoreKeyFactory(jksResource, keyStorePass.toCharArray());
+	    var keyPair = keyStoreKeyFactory.getKeyPair(keyPairAlias);
+	    
+	    jwtAccessTokenConverter.setKeyPair(keyPair);
+	    
+	    return jwtAccessTokenConverter;
 	}
 	
 	// Método que instancia o Autorization Code com PKCE
