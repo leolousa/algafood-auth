@@ -58,12 +58,12 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.authorizedGrantTypes("client_credentials") //Usando o fluxo Client Credentials
 				.scopes("read")
 			
-			.and()
+			.and() // URL para o Authorization Server: http://auth.algafood.local:8081/oauth/authorize?response_type=code&client_id=foodanalytics&state=abc&redirect_uri=http://aplicacao-cliente
 				.withClient("foodanalytics")
 				.secret(passwordEncoder.encode("food123"))
 				.authorizedGrantTypes("authorization_code") //Usando o fluxo Authorization Code Grant Type
 				.scopes("write","read")
-				.redirectUris("https://aplicacao-cliente")
+				.redirectUris("http://aplicacao-cliente") //URL de retorno do Authorization Server para a app cliente
 				
 			.and()
 				.withClient("api-check-token") //Nome da api(Resource Server) que quer se autenticar no Authorization Server
