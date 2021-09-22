@@ -19,7 +19,8 @@ public class JwtCustomClaimsTokenEnhancer implements TokenEnhancer {
 	@Override
 	public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
 		
-		if (authentication.getPrincipal() instanceof AuthUser) { //Verificação para saber se é um AuthUser (Authentication Code)
+		if (authentication.getPrincipal() instanceof AuthUser) { 
+			//Verificação para saber se é um AuthUser (Authentication Code)
 			var authUser = (AuthUser) authentication.getPrincipal(); 
 			
 			var info = new HashMap<String, Object>();
