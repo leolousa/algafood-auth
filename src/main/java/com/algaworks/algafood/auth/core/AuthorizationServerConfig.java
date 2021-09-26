@@ -2,13 +2,14 @@ package com.algaworks.algafood.auth.core;
 
 import java.util.Arrays;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -36,7 +37,7 @@ import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFacto
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
 	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private DataSource dataSource;
 	
 	@Autowired
 	private AuthenticationManager authManager;
@@ -47,34 +48,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Autowired
 	private JwtKeyStoreProperties jwtKeyStoreProperties;
 	
-	
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		
-		//Configuração do clientes autorizados a acessar este Authorization Server
-		clients
-			.inMemory()
-				.withClient("algafood-web") //Nome do cliente
-				.secret(passwordEncoder.encode("web123")) //Chave senha do cliente
-				.authorizedGrantTypes("password","refresh_token") //Usando o fluxo Password Credentials
-				.scopes("write", "read")
-				.accessTokenValiditySeconds(6 * 60 * 60) // 6h padrão é 12h
-				.refreshTokenValiditySeconds(60 * 24 * 60 * 60) // 60d padrão é 30d
-			
-			.and()
-				// Endereço para gerar Code Verifier e Code Challenge: https://tonyxu-io.github.io/pkce-generator/
-				// URL para o Authorization Server: http://auth.algafood.local:8081/oauth/authorize?response_type=code&client_id=foodanalytics&state=abc&redirect_uri=http://aplicacao-cliente
-			    // URL para o Authorization Server com PCSE SHA256:
-			    // http://auth.algafood.local:8081/oauth/authorize?response_type=code&client_id=foodanalytics&redirect_uri=http://foodanalytics.local:8082$code_challenge&code_challenge_method=s256
-				.withClient("foodanalytics")
-				.secret(passwordEncoder.encode("food123"))
-				.authorizedGrantTypes("authorization_code") //Usando o fluxo Authorization Code Grant Type
-				.scopes("write","read")
-				.redirectUris("http://foodanalytics.local:8082") //URL de retorno do Authorization Server para a app cliente
-				
-			.and()
-				.withClient("api-check-token") //Nome da api(Resource Server) que quer se autenticar no Authorization Server
-				.secret(passwordEncoder.encode("api123")); //Secret da api
+		//Configuração do clientes em Banco de dados, autorizados a acessar este Authorization Server
+		clients.jdbc(dataSource);
 	}
 	
 	@Override
